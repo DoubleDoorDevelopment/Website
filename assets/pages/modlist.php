@@ -31,16 +31,17 @@
             Version: <? echo $versions["version"] ?><br>
             Minecraft: <? echo $versions["mcversion"] ?><br>
             Forge: <? echo $versions["apiversion"] ?><br>
+            By using this mod you agree to its licence (included in the download).
           </p>
           <div class="btn-group">
             <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
               Download <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" role="menu">
-              <li><a href="<? echo $lastStableBuild["url"] . "artifact" . $files["normal"]["relativePath"]?>"><? echo $files["normal"]["fileName"] ?></a></li>
+              <li><a href="<? echo $lastStableBuild["url"] . "artifact/" . $files["normal"]["relativePath"]?>"><? echo $files["normal"]["fileName"] ?></a></li>
               <li class="divider"></li>
-              <li><a href="<? echo $lastStableBuild["url"] . "artifact" . $files["dev"]["relativePath"]?>"><? echo $files["dev"]["fileName"] ?></a></li>
-              <li><a href="<? echo $lastStableBuild["url"] . "artifact" . $files["src"]["relativePath"]?>"><? echo $files["src"]["fileName"] ?></a></li>
+              <li><a href="<? echo $lastStableBuild["url"] . "artifact/" . $files["dev"]["relativePath"]?>"><? echo $files["dev"]["fileName"] ?></a></li>
+              <li><a href="<? echo $lastStableBuild["url"] . "artifact/" . $files["src"]["relativePath"]?>"><? echo $files["src"]["fileName"] ?></a></li>
             </ul>
           </div>
         </div>
