@@ -1,5 +1,6 @@
 <h2>About us</h2>
-<p>We are a primarily open source developers crew.</br>
+<p>We are basically the continuation of CCM modding<br>
+We are a primarily open source developers crew.</br>
 Our main focus is Minecraft mods, but we are working on other things too. Shhhh!</br>
 We like open source because it promotes collaboration.</br>
 If you want to join us, feel free to message us or make a pull request.</p>
