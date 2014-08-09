@@ -1,3 +1,4 @@
+<h3 class="hiddenlink"><a href="?p=modpacks">Making a modpack?</a></h3>
 <?
   $jobs = json_decode(file_get_contents("http://jenkins.dries007.net/view/DoubleDoorDevelopment/api/json"), true)["jobs"];
   $amountOfJobs = count($jobs);
