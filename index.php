@@ -67,7 +67,7 @@
     <div class="container container-narrow" id="wrap">
       <div class="row">
         <h1 class="hiddenlink"><a href="?p=home">Double Door Development</a></h1>
-        <? if (ADMIN) echo "<p>Admin mode</p>"; ?>
+        <? if (ADMIN) echo "<p class=\"hiddenlink\">Admin mode <a href=\"?logout&p=$page\">(log out)</a></p>"; ?>
       </div>
       <? 
         if (is_file("assets/pages/$page.php")) include "assets/pages/$page.php";
