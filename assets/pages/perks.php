@@ -1,0 +1,153 @@
+<?
+  function getItem($thing)
+  {
+    if (!is_array($thing)) return "Not set.";
+    $out = "Name: " . $thing["name"];
+    if (isset($thing["meta"])) $out .= "<br>Meta: " . $thing["meta"];
+    if (isset($thing["size"])) $out .= "<br>Size: " . $thing["size"];
+    return $out;
+  }
+  
+  function utf8ize($d) {
+    if (is_array($d)) {
+      foreach ($d as $k => $v) {
+        $d[$k] = utf8ize($v);
+      }
+    } else if (is_string ($d)) {
+      return utf8_encode($d);
+    }
+    return $d;
+  }
+  
+  $json = json_decode(file_get_contents("perks.json"), true);
+  
+  if (ADMIN && isset($_GET["delete"]))
+  {
+    unset($json[$_GET["delete"]]);
+    file_put_contents("perks.json", json_encode($json, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
+  }
+  
+  if (ADMIN && isset($_POST["name"]))
+  {
+    $data = array(
+    "displayname" => $_POST["displayname"],
+    "hat" => array(
+      "name" => $_POST["hatName"],
+      "meta" => $_POST["hatMeta"]),
+    "drop" => array(
+      "name" => $_POST["dropName"],
+      "meta" => $_POST["dropMeta"],
+      "size" => $_POST["dropSize"])
+    );
+    if ($data["displayname"] === "") unset($data["displayname"]);
+    if ($data["hat"]["name"] === "") unset($data["hat"]["name"]);
+    if ($data["hat"]["meta"] === "") unset($data["hat"]["meta"]);
+    if (empty($data["hat"]))         unset($data["hat"]);
+    
+    if ($data["drop"]["name"] === "") unset($data["drop"]["name"]);
+    if ($data["drop"]["meta"] === "") unset($data["drop"]["meta"]);
+    if ($data["drop"]["size"] === "") unset($data["drop"]["size"]);
+    if (empty($data["drop"]))         unset($data["drop"]);
+    
+    $json[$_POST["name"]] = $data;
+    file_put_contents("perks.json", json_encode($json, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
+  }
+  
+  if (ADMIN && (isset($_GET["new"]) || isset($_GET["edit"])))
+  {
+    $isnew = isset($_GET["new"]);
+    $name = @$_GET["edit"];
+    $data = isset($json[$name]) ? $json[$name] : array();
+?>
+<h2>Edit <? echo $name; ?>'s dev perks</h2>
+<p class="hiddenlink"><a href="http://minecraft-ids.grahamedgecombe.com/">Minecraft id list</a></p>
+<div class="col-md-offset-4 col-md-4">
+  <form role="form" method="post" action="?p=perks">
+    <? if ($isnew) { ?>
+    <!-- Username -->
+    <div class="form-group">
+      <label for="name">Username name</label>
+      <input class="form-control" name="name" id="name" placeholder="Username (case sensitive!)">
+    </div>
+    <? } ?>
+    <!-- Display Name -->
+    <div class="form-group">
+      <label for="displayname">Display name</label>
+      <input class="form-control" name="displayname" id="displayname" placeholder="Display name" value="<? echo @$data["displayname"] ?>">
+    </div>
+    <!-- Hat Stuff -->
+    <div class="form-group">
+      <label for="hatName">Hat Item</label>
+      <div class="input-group">
+        <div class="input-group-addon">Name</div>
+        <input class="form-control" name="hatName" id="hatName" placeholder="Block name" value="<? echo @$data["hat"]["name"] ?>">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group">
+        <div class="input-group-addon">Meta</div>
+        <input class="form-control" name="hatMeta" id="hatMeta" placeholder="0 by default" value="<? echo @$data["hat"]["meta"] ?>">
+      </div>
+    </div>
+    <!-- Drop Stuff -->
+    <div class="form-group">
+      <label for="dropName">Drop Item</label>
+      <div class="input-group">
+        <div class="input-group-addon">Name</div>
+        <input class="form-control" name="dropName" id="dropName" placeholder="Block name" value="<? echo @$data["drop"]["name"] ?>">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group">
+        <div class="input-group-addon">Meta</div>
+        <input class="form-control" name="dropMeta" id="dropMeta" placeholder="0 by default" value="<? echo @$data["drop"]["meta"] ?>">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group">
+        <div class="input-group-addon">Size</div>
+        <input class="form-control" name="dropSize" id="dropSize" placeholder="1 by default" value="<? echo @$data["drop"]["size"] ?>">
+      </div>
+    </div>
+    <!-- Btn -->
+    <? if (!$isnew) { ?><input type="hidden" name="name" value="<? echo $name;?>"><? } ?>
+    <button type="submit" class="btn btn-default">Submit</button>
+  </form>
+</div>
+<? } else { ?>
+<h2>Dev perk list</h2>
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th class="col-md-2">Username</th>
+      <th class="col-md-2">Displayname</th>
+      <th class="col-md-3">Hat</th>
+      <th class="col-md-3">Drop</th>
+      <th class="col-md-2"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <? foreach ($json as $name => $row) { ?>
+    <tr>
+      <td><? echo $name; ?></td>
+      <td><? echo $row["displayname"]; ?></td>
+      <td><? echo getItem(@$row["hat"]); ?></td>
+      <td><? echo getItem(@$row["drop"]); ?></td>
+      <td>
+        <? if (ADMIN) { ?>
+        <div class="btn-group">
+          <a href="?p=perks&edit=<? echo $name; ?>" class="btn btn-default">Edit</a>
+          <a href="?p=perks&delete=<? echo $name; ?>" class="btn btn-danger">Delete</a>
+        </div>
+        <? } ?>
+      </td>
+    </tr>
+    <? } ?>
+  </tbody>
+</table>
+<? if (ADMIN) { ?>
+<a href="?p=perks&new" class="btn btn-default">Add new</a>
+<? }
+  } ?>
+  
+<p><a href="?p=login">Log in for edit mode</a></p>

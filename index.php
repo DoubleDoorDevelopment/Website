@@ -3,9 +3,21 @@
   error_reporting(E_ALL);
   ini_set("display_errors", 1);
   
+  session_start();
+  
   $page = "index";
   if (isset($_GET['p'])) $page = $_GET['p'];
   else if (isset($_GET['page'])) $page = $_GET['page'];
+  
+  include("mysql.php");
+  
+  if (isset($_GET["logout"])) 
+  {
+    session_destroy();
+    $_SESSION = array();
+  }
+  
+  define ("ADMIN", isset($_SESSION["admin"]));
   
   function contains($keystack, $needle)
   {
@@ -43,9 +55,11 @@
 -->
 <html>
   <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, minimum-scale=0.1">
     <title>Double Door Development</title>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" type='text/css'>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet" type='text/css'>
     <link href='http://fonts.googleapis.com/css?family=PT+Sans+Narrow' rel='stylesheet' type='text/css'>
     <link href="assets/css/style.css" rel="stylesheet" type='text/css'>
   </head>
@@ -53,6 +67,7 @@
     <div class="container container-narrow" id="wrap">
       <div class="row">
         <h1 class="hiddenlink"><a href="?p=home">Double Door Development</a></h1>
+        <? if (ADMIN) echo "<p>Admin mode</p>"; ?>
       </div>
       <? 
         if (is_file("assets/pages/$page.php")) include "assets/pages/$page.php";
