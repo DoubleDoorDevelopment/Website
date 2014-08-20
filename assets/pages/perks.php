@@ -61,7 +61,11 @@
 ?>
 <h2>Edit <? echo $name; ?>'s dev perks</h2>
 <p class="hiddenlink"><a href="http://minecraft-ids.grahamedgecombe.com/">Minecraft id list</a></p>
-<div class="col-md-offset-4 col-md-4">
+<p><b>No offensive stuff in here!</b></p>
+<div class="col-md-4">
+  <? include "assets/php/colors.php"; ?>
+</div>
+<div class="col-md-4">
   <form role="form" method="post" action="?p=perks">
     <? if ($isnew) { ?>
     <!-- Username -->
@@ -149,5 +153,4 @@
 <a href="?p=perks&new" class="btn btn-default">Add new</a>
 <? }
   } ?>
-  
-<p><a href="?p=login">Log in for edit mode</a></p>
+<? if (!ADMIN) { ?><p><a href="?p=login">Log in for edit mode</a></p><? } ?>
