@@ -8,7 +8,7 @@
     if (crypt($_POST['password'], $user['hash']) === $user['hash'])
     {
       $message = "Logged on successfully.";
-      $_SESSION["admin"] = true;
+      $_SESSION["admin"] = $user["permlvl"];
     }
     else
     {
