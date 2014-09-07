@@ -1,4 +1,7 @@
 <?
+define ("CORE", "D3Core");
+define ("SITE", "DoubleDoorDevelopmentWebsite");
+
 class mod 
 {
   public $displayName;
@@ -38,12 +41,12 @@ class mod
   
   function isCore()
   {
-    return "D3Core" === $this->name;
+    return CORE === $this->name;
   }
   
   function isSite()
   {
-    return "DoubleDoorDevelopmentWebsite" === $this->name;
+    return SITE === $this->name;
   }
   
   function printBox()

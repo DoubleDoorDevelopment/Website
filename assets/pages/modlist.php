@@ -9,12 +9,11 @@
     $mods[$mod->name] = $mod;
   }
   
-  if (isset($_GET["mod"])) echo '<div class="col-md-6">';
+  if (isset($_GET["mod"]) && $_GET["mod"] !== CORE) echo '<div class="col-md-6">';
   
-  $mods["D3Core"]->printBox();
+  $mods[CORE]->printBox();
   
-  if (isset($_GET["mod"])) echo '</div>';
-  else echo "<hr>";
+  if (isset($_GET["mod"]) && $_GET["mod"] !== CORE) echo '</div>';
   
   $i = 0;
   foreach ($mods as $mod)
@@ -22,6 +21,7 @@
     if ($mod->isCore() || $mod->isSite()) continue;
     if (isset($_GET["mod"]) && $mod->name !== $_GET["mod"]) continue;
     $newRow = $i % 2 == 0;
+    
     if ($newRow) echo '<div class="row">';
     echo '<div class="col-md-6">';
     
@@ -29,6 +29,7 @@
     
     echo '</div>';
     if (!$newRow) echo '</div>';
+    
     $i++;
   }
   if (count($mods) % 2 != 0) echo '</div>';
