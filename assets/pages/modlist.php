@@ -1,17 +1,35 @@
 <h3 class="hiddenlink"><a href="?p=modpacks">Making a modpack?</a></h3>
 <?
-  $job = json_decode(file_get_contents("http://jenkins.dries007.net/job/D3Core/api/json?tree=url,description,name,displayName,lastStableBuild[url,artifacts[*],timestamp]"), true);
+  $notshown = array("D3Core", "DoubleDoorDevelopmentWebsite");
+  $jobs = json_decode(file_get_contents("http://jenkins.dries007.net/view/DoubleDoorDevelopment/api/json?tree=jobs[url,description,name,displayName,lastStableBuild[url,artifacts[*],timestamp]]"), true)["jobs"];
+
+  $job = array();
+  foreach ($jobs as $temp_job)
+  {
+    $job = $temp_job;
+    if ($job["name"] === "D3Core") break;
+  }
+  
   $lastStableBuild = $job["lastStableBuild"];
   $files = array();
+  $version = "?";
+  $mcVersion = "?";
   foreach ($lastStableBuild["artifacts"] as $file)
   {
     if (!contains($file["fileName"], "jar")) continue;
     
     if (contains($file["fileName"], "dev")) $files["dev"] = $file;
     else if (contains($file["fileName"], "src")) $files["src"] = $file;
-    else $files["normal"] = $file;
+    else 
+    {
+      $files["normal"] = $file;
+      $versions = explode("-", $file["fileName"]);
+      $version = $versions[1];
+      $mcVersion = $versions[2];
+    }
   }
-  $versions = @json_decode(file_get_contents("$lastStableBuild[url]artifact/versions.json"), true);
+  
+  if (isset($_GET["mod"])) echo '<div class="col-md-6">';
 ?>
 <div class="panel panel-success">
   <div class="panel-heading"><h2 class="panel-title-custom hiddenlink"><a href="?p=modlist&mod=<? echo $job["name"] ?>"><? echo $job["displayName"] ?></a></h2></div>
@@ -20,10 +38,9 @@
     <h3>Last successful build</h3>
     <p>
       <? echo date("Y-m-d H:i", $lastStableBuild["timestamp"] / 1000) ?><br>
-      Version: <? echo $versions["version"] ?><br>
-      Minecraft: <? echo $versions["mcversion"] ?><br>
-      Forge: <? echo $versions["apiversion"] ?><br>
-      By using this mod you agree to its licence (included in the download).
+      Version: <? echo $version ?><br>
+      Minecraft: <? echo $mcVersion ?><br>
+      By using this mod you agree to its licence (see github).
     </p>
     <div class="btn-group">
       <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
@@ -38,32 +55,37 @@
     </div>
   </div>
 </div>
-<hr>
+<? if (isset($_GET["mod"])) echo '</div>';
+   else echo "<hr>"?>
 <?
-  $jobs = json_decode(file_get_contents("http://jenkins.dries007.net/view/DoubleDoorDevelopment/api/json"), true)["jobs"];
   $amountOfJobs = count($jobs);
-  $centerd = isset($_GET["mod"]) || $amountOfJobs == 1;
   $i = 0;
   foreach ($jobs as $job)
   {
-    if ($job["name"] === "D3Core") continue;
+    if (in_array($job["name"], $notshown)) continue;
     $newRow = $i % 2 == 0;
     if (isset($_GET["mod"]) && $job["name"] !== $_GET["mod"]) continue;
-    if ($centerd || $newRow) echo "<div class=\"row\">";
-    $job = json_decode(file_get_contents("$job[url]api/json?tree=url,description,name,displayName,lastStableBuild[url,artifacts[*],timestamp]"), true);
+    if ($newRow) echo "<div class=\"row\">";
     $lastStableBuild = $job["lastStableBuild"];
     $files = array();
+    $version = "?";
+    $mcVersion = "?";
     foreach ($lastStableBuild["artifacts"] as $file)
     {
       if (!contains($file["fileName"], "jar")) continue;
       
       if (contains($file["fileName"], "dev")) $files["dev"] = $file;
       else if (contains($file["fileName"], "src")) $files["src"] = $file;
-      else $files["normal"] = $file;
+      else 
+      {
+        $files["normal"] = $file;
+        $versions = explode("-", $file["fileName"]);
+        $version = $versions[1];
+        $mcVersion = $versions[2];
+      }
     }
-    $versions = @json_decode(file_get_contents("$lastStableBuild[url]artifact/versions.json"), true);
     ?>
-    <div class="col-md-6<? if ($centerd) echo " col-md-offset-3"?>">
+    <div class="col-md-6">
       <div class="panel panel-info">
         <div class="panel-heading"><h2 class="panel-title-custom hiddenlink"><a href="?p=modlist&mod=<? echo $job["name"] ?>"><? echo $job["displayName"] ?></a></h2></div>
         <div class="panel-body">
@@ -71,10 +93,9 @@
           <h3>Last successful build</h3>
           <p>
             <? echo date("Y-m-d H:i", $lastStableBuild["timestamp"] / 1000) ?><br>
-            Version: <? echo $versions["version"] ?><br>
-            Minecraft: <? echo $versions["mcversion"] ?><br>
-            Forge: <? echo $versions["apiversion"] ?><br>
-            By using this mod you agree to its licence (included in the download).
+            Version: <? echo $version ?><br>
+            Minecraft: <? echo $mcVersion ?><br>
+            By using this mod you agree to its licence (see github).
           </p>
           <div class="btn-group">
             <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
@@ -91,8 +112,8 @@
       </div>
     </div>
     <?
-    if ($centerd || !$newRow) echo "</div>";
+    if (!$newRow) echo "</div>";
     $i++;
   }
-  if (!$centerd && $amountOfJobs % 2 != 0) echo "</div>";
+  if ($amountOfJobs % 2 != 0) echo "</div>";
 ?>

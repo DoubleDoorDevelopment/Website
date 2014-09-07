@@ -16,12 +16,12 @@ html, body {
 #wrap {
   min-height: 100%;
   height: auto;
-  margin: 0 auto -33px;
-  padding: 0 0 33px;
+  margin: 0 auto -55px;
+  padding: 0 0 55px;
 }
 
 #footer {
-  height: 33px;
+  height: 55px;
 }
 
 .panel-title-custom
