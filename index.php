@@ -17,6 +17,8 @@
     $_SESSION = array();
   }
   
+  if (!isset($_SESSION["permlvl"])) $_SESSION["permlvl"] = 0;
+  
   define ("ADMIN", $_SESSION["permlvl"]);
   
   function contains($keystack, $needle)
