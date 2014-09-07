@@ -23,9 +23,9 @@
     else 
     {
       $files["normal"] = $file;
-      $versions = explode("-", $file["fileName"]);
-      $version = $versions[1];
-      $mcVersion = $versions[2];
+      $versions = explode("-", str_replace(".jar", "", $file["fileName"]));
+      $version = $versions[2];
+      $mcVersion = $versions[1];
     }
   }
   
@@ -79,9 +79,9 @@
       else 
       {
         $files["normal"] = $file;
-        $versions = explode("-", $file["fileName"]);
-        $version = $versions[1];
-        $mcVersion = $versions[2];
+        $versions = explode("-", str_replace(".jar", "", $file["fileName"]));
+        $version = $versions[2];
+        $mcVersion = $versions[1];
       }
     }
     ?>
