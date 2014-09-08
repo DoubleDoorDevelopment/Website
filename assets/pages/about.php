@@ -3,7 +3,7 @@
 We are a primarily open source developers crew.</br>
 Our main focus is Minecraft mods, but we are working on other things too. Shhhh!</br>
 We like open source because it promotes collaboration.</br>
-If you want to join us, feel free to message us or make a pull request.
+If you want to join us, feel free to message us or make a pull request.</br>
 We don't use capes for our developers/testers/sponsors, we give them <a href="?p=perks">other things.</a></p>
 
 <h2>Members</h2>
