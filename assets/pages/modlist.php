@@ -2,7 +2,7 @@
 <?
   include "assets/php/mod.class.php";
   $mods = array();
-  $jobs = json_decode(file_get_contents("http://jenkins.dries007.net/view/DoubleDoorDevelopment/api/json?tree=jobs[url,description,name,displayName,lastStableBuild[url,artifacts[*],timestamp]]"), true)["jobs"];
+  $jobs = json_decode(file_get_contents("http://jenkins.dries007.net/view/D3_mods/api/json?tree=jobs[url,description,name,displayName,lastStableBuild[url,artifacts[*],timestamp]]"), true)["jobs"];
   foreach ($jobs as $job)
   {
     $mod = new mod($job);
@@ -18,7 +18,7 @@
   $i = 0;
   foreach ($mods as $mod)
   {
-    if ($mod->isCore() || $mod->isSite()) continue;
+    if ($mod->isCore()) continue;
     if (isset($_GET["mod"]) && $mod->name !== $_GET["mod"]) continue;
     $newRow = $i % 2 == 0;
     
