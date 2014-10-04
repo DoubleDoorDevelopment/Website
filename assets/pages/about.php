@@ -19,7 +19,7 @@ Email: dries at doubledoordev.net</p>
 <h3>Claycorp</h3>
 <p class="hiddenlink">Minecraft ign: claycorp<br>
 IRC handle: Claycorp<br>
-Email: clay at doubledoordev.net</p>
+Email: claycorp at doubledoordev.net</p>
 
 <h2>About the website</h2>
 <p>We don't claim ownership over the sound effect's or graphics used.</p>
