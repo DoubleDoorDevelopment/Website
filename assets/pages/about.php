@@ -10,16 +10,7 @@ We don't use capes for our developers/testers/sponsors, we give them <a href="?p
 <p>Our core team consists of Dries007 &amp; Claycorp.<br>
 A full (and always up to date) member list can be found on <a href="https://github.com/orgs/DoubleDoorDevelopment/people">github</a>.</p>
 
-<h3>Dries007</h3>
-<p class="hiddenlink">Minecraft ign: dries007<br>
-IRC handle: Dries007 or Dries|gone<br>
-Website: <a href="http://dries007.net">Dries007.net</a><br>
-Email: dries at doubledoordev.net</p>
-
-<h3>Claycorp</h3>
-<p class="hiddenlink">Minecraft ign: claycorp<br>
-IRC handle: Claycorp<br>
-Email: claycorp at doubledoordev.net</p>
+<p><a href="?p=contact">Contact information here!</a></p>
 
 <h2>About the website</h2>
 <p>We don't claim ownership over the sound effect's or graphics used.</p>
