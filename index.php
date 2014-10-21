@@ -82,7 +82,7 @@
 			<div class="container">
 				<p class="muted credit">
 					<a href="?p=about">&copy; Double Door Development 2014</a><br>
-          Build in <? $end = microtime(true); echo round(($end - $start), 4);?> sec.
+          Built in <? $end = microtime(true); echo round(($end - $start), 4);?> sec.
 				</p>
 			</div>
 		</div>
