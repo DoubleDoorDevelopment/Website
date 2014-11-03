@@ -5,6 +5,9 @@
     $out = "Name: " . $thing["name"];
     if (isset($thing["meta"])) $out .= "<br>Meta: " . $thing["meta"];
     if (isset($thing["size"])) $out .= "<br>Size: " . $thing["size"];
+	if (isset($thing["display"])) $out .= "<br>Display: " . $thing["display"];
+	if (isset($thing["color"])) $out .= "<br>Color: #" . dechex($thing["color"]);
+	if (isset($thing["lore"])) $out .= "<br>Lore: " . implode(" - ", $thing["lore"]);
     return $out;
   }
   
@@ -33,20 +36,33 @@
     "displayname" => $_POST["displayname"],
     "hat" => array(
       "name" => $_POST["hatName"],
-      "meta" => $_POST["hatMeta"]),
+      "meta" => $_POST["hatMeta"],
+	  "display" => $_POST["hatDisplay"],
+	  "color" => @$json[$_POST["name"]]["hat"]["color"],
+	  "lore" => @$json[$_POST["name"]]["hat"]["lore"]),
     "drop" => array(
       "name" => $_POST["dropName"],
       "meta" => $_POST["dropMeta"],
-      "size" => $_POST["dropSize"])
+      "size" => $_POST["dropSize"],
+	  "display" => $_POST["dropDisplay"],
+	  "color" => @$json[$_POST["name"]]["drop"]["lore"],
+	  "lore" => @$json[$_POST["name"]]["drop"]["lore"])
     );
     if ($data["displayname"] === "") unset($data["displayname"]);
     if ($data["hat"]["name"] === "") unset($data["hat"]["name"]);
     if ($data["hat"]["meta"] === "") unset($data["hat"]["meta"]);
+	//if ($data["hat"]["size"] === "") unset($data["hat"]["size"]); because 0
+    if ($data["hat"]["display"] === "") unset($data["hat"]["display"]);
+    if ($data["hat"]["color"] === 0 || $data["hat"]["color"] == null) unset($data["hat"]["color"]);
+    if (empty ($data["hat"]["lore"]) || $data["hat"]["lore"][0] === "") unset($data["hat"]["lore"]);
     if (empty($data["hat"]))         unset($data["hat"]);
     
     if ($data["drop"]["name"] === "") unset($data["drop"]["name"]);
     if ($data["drop"]["meta"] === "") unset($data["drop"]["meta"]);
     if ($data["drop"]["size"] === "") unset($data["drop"]["size"]);
+	if ($data["drop"]["display"] === "") unset($data["drop"]["display"]);
+    if ($data["drop"]["color"] === 0 || $data["drop"]["color"] == null) unset($data["drop"]["color"]);
+	if (empty ($data["drop"]["lore"]) || $data["drop"]["lore"][0] === "") unset($data["drop"]["lore"]);
     if (empty($data["drop"]))         unset($data["drop"]);
     
     $json[$_POST["name"]] = $data;
@@ -93,6 +109,12 @@
         <input class="form-control" name="hatMeta" id="hatMeta" placeholder="0 by default" value="<? echo @$data["hat"]["meta"] ?>">
       </div>
     </div>
+	<div class="form-group">
+      <div class="input-group">
+        <div class="input-group-addon">Display name</div>
+        <input class="form-control" name="hatDisplay" id="hatDisplay" placeholder="" value="<? echo @$data["hat"]["display"] ?>">
+      </div>
+    </div>
     <!-- Drop Stuff -->
     <div class="form-group">
       <label for="dropName">Drop Item</label>
@@ -111,6 +133,12 @@
       <div class="input-group">
         <div class="input-group-addon">Size</div>
         <input class="form-control" name="dropSize" id="dropSize" placeholder="1 by default" value="<? echo @$data["drop"]["size"] ?>">
+      </div>
+    </div>
+	<div class="form-group">
+      <div class="input-group">
+        <div class="input-group-addon">Display name</div>
+        <input class="form-control" name="dropDisplay" id="dropDisplay" placeholder="" value="<? echo @$data["drop"]["display"] ?>">
       </div>
     </div>
     <!-- Btn -->
