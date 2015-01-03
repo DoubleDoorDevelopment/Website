@@ -5,6 +5,4 @@ What we would like is a link to our website on your modlist, and a tweet so we c
 If you use a custom jar you must make that clear. A simple name change (to for example "PlaceableTools-unofficial.jar") suffices.<br></p>
 <p>The full licence file can be found on every gihub repository.</p>
 <p><a href="?p=about">If you are not sure or have questions, ask us!</a></p>
-<p><b>Lastly, please remember that this permission is reversible, and can be changed on a per modpack basis as we see fit.</b><br>
-One way of getting your permission revoked is by ignoring direct requests by us.</p>
-<p>Last edited 2014-08-28 12:30 UTC +01:00</p>
+<p>Last edited 2015-01-03 16:50 UTC +01:00</p>
