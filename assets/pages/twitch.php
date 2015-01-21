@@ -13,7 +13,6 @@
             $json = @json_decode(file_get_contents("https://api.twitch.tv/kraken/user?oauth_token=" . $_POST["token"]), true);
             $twitchName = $json["name"];
             if ($json == NULL) echo "<p>An error occured. Please try again.</p>";
-            var_dump($json);
             $json = is_file("twitch.json") ? json_decode(file_get_contents("twitch.json"), true) : array();
             $json[$uuid] = $twitchName;
             file_put_contents("twitch.json", json_encode($json));
