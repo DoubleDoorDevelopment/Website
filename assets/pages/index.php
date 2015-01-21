@@ -2,15 +2,15 @@
   <tr>
     <td style="text-align: center; vertical-align: middle;">
       <a href="?p=home">
-        <img src="assets/img/DoubleDoorDevNoBg.png" onmouseover="on()" onmouseout="off()" height=300px></img>
+        <img src="assets/img/DoubleDoorDevNoBg.png" onmouseover="on()" onmouseout="off()" height=300px />
       </a>
     </td>
   </tr>
 </table>
 
 <noscript><a href="?p=home">No script :( Click here.</a></noscript>
-<audio><source src="assets/mp3/door_open.mp3"></source></audio>
-<audio><source src="assets/mp3/door_close.mp3"></source></audio>
+<audio><source src="assets/mp3/door_open.mp3" /></audio>
+<audio><source src="assets/mp3/door_close.mp3" /></audio>
 <script>
   function on()
   {
