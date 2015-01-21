@@ -1,6 +1,6 @@
 <?
     include "twitch.inc.php";
-    define("SCOPE", "channel_subscriptions+channel_check_subscriptions");
+    define("SCOPE", "channel_subscriptions+channel_check_subscription");
 ?>
 <h2>Twitch token generator</h2>
 <p>
