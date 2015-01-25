@@ -5,12 +5,15 @@
     
     if (isset($_POST["username"]))
     {
-        $json = @json_decode(file_get_contents("https://api.mojang.com/users/profiles/minecraft/" . $_POST["username"]), true);
+        $username = strip_tags($_POST["username"]);
+        $token = strip_tags($_POST["token"]);
+        if (!preg_match("/^\\w+$/", $username) || !preg_match("/\w+/i", $token)) die("Fraud attempt.");
+        $json = @json_decode(file_get_contents("https://api.mojang.com/users/profiles/minecraft/" . $username), true);
         if ($json == NULL) echo "<p>An error occured. Please try again.</p>";
         else 
         {
             $uuid = $json["id"];
-            $json = @json_decode(file_get_contents("https://api.twitch.tv/kraken/user?oauth_token=" . $_POST["token"]), true);
+            $json = @json_decode(file_get_contents("https://api.twitch.tv/kraken/user?oauth_token=" . $token), true);
             $twitchName = $json["name"];
             if ($json == NULL) echo "<p>An error occured. Please try again.</p>";
             $json = is_file("twitch.json") ? json_decode(file_get_contents("twitch.json"), true) : array();
