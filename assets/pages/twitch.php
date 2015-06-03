@@ -1,7 +1,8 @@
 <h2>Twitch.tv</h2>
 <?
     include "twitch.inc.php";
-    define("SCOPE", "channel_subscriptions+channel_check_subscription+user_read");
+    define("SCOPE", "channel_subscriptions+channel_check_subscription+user_read+user_subscriptions");
+	define("FILE", "twitch.json");
     
     if (isset($_POST["username"]))
     {
@@ -16,9 +17,9 @@
             $json = @json_decode(file_get_contents("https://api.twitch.tv/kraken/user?oauth_token=" . $token), true);
             $twitchName = $json["name"];
             if ($json == NULL) echo "<p>An error occured. Please try again.</p>";
-            $json = is_file("twitch.json") ? json_decode(file_get_contents("twitch.json"), true) : array();
+            $json = is_file(FILE) ? json_decode(file_get_contents(FILE), true) : array();
             $json[$uuid] = $twitchName;
-            file_put_contents("twitch.json", json_encode($json));
+            file_put_contents(FILE, json_encode($json));
             
             echo "<p>All done.</p>";
         }
@@ -31,6 +32,9 @@
     If you are a streamer with a sub button, you will be asked for a token for the Pay2Spawn and/or ForgeTwitchSubWhitelist config file.<br>
     Click the button below to get started.<br>
     <br>
+	<b>Be warned: If you get a new token, the old one expires!</b>
+	<br>
+	<br>
     <button class="btn btn-primary btn-lg" onclick="location.href='https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id=<? echo TWITCH_CLIENTID ?>&redirect_uri=http://www.doubledoordev.net/?p=twitch&scope=<? echo SCOPE ?>'">Authenticate with Twitch.tv!</button>
 </p>
 <div id="post">
@@ -47,7 +51,6 @@
     <p>
         If you need the token for a config file, here it is:<br>
         <b><span id="token2"></span></b><br>
-        Be warned: If you get a new token, the old one expires!
     </p>
 </div>
 <script type="text/javascript">
