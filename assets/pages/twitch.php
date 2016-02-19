@@ -1,25 +1,26 @@
 <h2>Twitch.tv</h2>
 <?
     include "twitch.inc.php";
+    include "mysql.php";
     define("SCOPE", "channel_subscriptions+channel_check_subscription+user_read+user_subscriptions");
-	define("FILE", "twitch.json");
     
     if (isset($_POST["username"]))
     {
         $username = strip_tags($_POST["username"]);
         $token = strip_tags($_POST["token"]);
         if (!preg_match("/^\\w+$/", $username) || !preg_match("/\w+/i", $token)) die("Fraud attempt.");
-        $json = @json_decode(file_get_contents("https://api.mojang.com/users/profiles/minecraft/" . $username), true);
-        if ($json == NULL) echo "<p>An error occured. Please try again.</p>";
+        $json = @json_decode(file_get_contents("https://api.mojang.com/users/profiles/minecraft/$username"), true);
+        if ($json == NULL) echo "<p>An error occured. Please try again. Error 1</p><p>Did you spell your IGN correctly? This is what we got: $username</p>";
         else 
         {
             $uuid = $json["id"];
-            $json = @json_decode(file_get_contents("https://api.twitch.tv/kraken/user?oauth_token=" . $token), true);
+            $json = @json_decode(file_get_contents("https://api.twitch.tv/kraken/user?oauth_token=$token"), true);
             $twitchName = $json["name"];
-            if ($json == NULL) echo "<p>An error occured. Please try again.</p>";
-            $json = is_file(FILE) ? json_decode(file_get_contents(FILE), true) : array();
-            $json[$uuid] = $twitchName;
-            file_put_contents(FILE, json_encode($json));
+            if ($json == NULL) echo "<p>An error occured. Please try again. Error 2</p>";
+
+            $db = makeDBConnection();
+            $stmt = $db->prepare("INSERT INTO minecraft SET Twitch = ?, UUID = ? ON DUPLICATE KEY UPDATE Twitch = ?");
+            $stmt->execute(array($twitchName, $uuid, $twitchName));
             
             echo "<p>All done.</p>";
         }

@@ -3,4 +3,6 @@ files
 perks.json
 mysql.php
 twitch.inc.php
+gamewisp.inc.php
 twitch.json
+.idea
