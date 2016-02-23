@@ -28,7 +28,7 @@
   }
 ?>
 <!-- 
-    Copyright (c) 2014, Dries007 & DoubleDoorDevelopment
+    Copyright (c) 2014 - 2016 Dries007 & DoubleDoorDevelopment
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -82,7 +82,7 @@
 		<div id="footer" class="hiddenlink">
 			<div class="container">
 				<p class="muted credit">
-					<a href="?p=about">&copy; Double Door Development 2014</a><br>
+					<a href="?p=about">&copy; 2014 - 2016 Double Door Development</a><br>
           Built in <? $end = microtime(true); echo round(($end - $start), 4);?> sec.
 				</p>
 			</div>
