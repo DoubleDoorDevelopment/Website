@@ -1,7 +1,7 @@
 <?
   // Error reporting for debug
-  error_reporting(E_ALL);
-  ini_set("display_errors", 1);
+//  error_reporting(E_ALL);
+//  ini_set("display_errors", 1);
   $start = microtime(true);
   
   session_start();

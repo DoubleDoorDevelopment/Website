@@ -1,3 +1,4 @@
+<?php header("Location: /?p=linking"); die("Moved to ?p=linking"); ?>
 <h2>Twitch.tv</h2>
 <?
     include "twitch.inc.php";

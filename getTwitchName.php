@@ -41,7 +41,7 @@ try
 {
     include "mysql.php";
     $db = makeDBConnection();
-    $stmt = $db->prepare("SELECT Twitch FROM minecraft WHERE UUID=?");
+    $stmt = $db->prepare("SELECT Twitch FROM minecraft WHERE UUID=? AND TwitchVerified = 1");
     $stmt->execute(array($uuid));
     echo $stmt->fetch(PDO::FETCH_NUM)[0];
 }

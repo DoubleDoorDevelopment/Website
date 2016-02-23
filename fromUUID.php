@@ -15,7 +15,10 @@ if (!isset($_GET["uuid"]))
     echo "JSON:\n";
     echo "\n" . json_encode(["c93ca410-8003-40ef-81d7-ac88719e2038" => ["Twitch" => "dries007", "GameWisp" => "dries007"]], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
     echo "The real output is not pretty printed, unless you add 'pp' to the GET parameters.\n";
-    echo "The key used depends the supplied UUID.\n(If you use 23 char, it'll be 32 char)\n";
+    echo "The key used depends the supplied UUID.\n(If you use 32 char, it'll be 32 char)\n";
+    echo "An unknown user will NOT be included in the output object.\n";
+    echo "Any service not verified is left out.\n";
+    echo "If a user has no services verified, the user is excluded from the output.\n";
     die("\nSee https://github.com/DoubleDoorDevelopment/Website for more information.");
 }
 
@@ -64,13 +67,20 @@ try
 {
     include "mysql.php";
     $db = makeDBConnection();
-    $stmt = $db->prepare("SELECT Twitch, GameWisp FROM minecraft WHERE UUID=?");
+    $stmt = $db->prepare("SELECT Twitch, BIN(TwitchVerified), GameWisp, BIN(GameWispVerified) FROM minecraft WHERE UUID=?");
     $out = [];
     foreach ($UUIDs as $UUID)
     {
         $stmt->execute(array(strlen($UUID) == 36 ? str_replace('-', '', $UUID) : $UUID));
         $tmp = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($tmp !== false) $out[$UUID] = $tmp;
+        if ($tmp === false) continue;
+
+        $user = [];
+
+        if ($tmp['BIN(TwitchVerified)'] == 1) $user['Twitch'] = $tmp['Twitch'];
+        if ($tmp['BIN(GameWispVerified)'] == 1) $user['GameWisp'] = $tmp['GameWisp'];
+
+        if (!empty($user)) $out[$UUID] = $user;
     }
 
     header('Content-Type:application/json');
