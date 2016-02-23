@@ -61,10 +61,10 @@ try
     $twitchToken = $tmp['TwitchToken'];
     $gamewispToken = $tmp['GameWispAccessToken'];
 
-    if (isset($_GET['twitch'], $_GET['gamewisp'], $_GET['uuid']))
+    if (isset($_GET['uuid']))
     {
-        $twitch = filter_var($_GET['twitch'], FILTER_VALIDATE_BOOLEAN);
-        $gamewisp = filter_var($_GET['gamewisp'], FILTER_VALIDATE_INT);
+        $twitch = isset($_GET['twitch']) ? filter_var($_GET['twitch'], FILTER_VALIDATE_BOOLEAN) : null;
+        $gamewisp = isset($_GET['gamewisp']) ? filter_var($_GET['gamewisp'], FILTER_VALIDATE_INT) : null;
         $uuid = checkUUID($_GET['uuid']);
 
         if ($channelOwner === $uuid)
@@ -78,7 +78,7 @@ try
         $tmp = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($tmp === false) die("false");
 
-        if ($twitch)
+        if ($twitch != null && $twitch)
         {
             try
             {
@@ -94,7 +94,7 @@ try
 
             }
         }
-        if ($gamewisp != -1)
+        if ($gamewisp != null && $gamewisp != -1)
         {
             try
             {
