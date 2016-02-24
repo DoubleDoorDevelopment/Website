@@ -65,7 +65,7 @@ else
 
 try
 {
-    include "mysql.php";
+    include "mysql.inc.php";
     $db = makeDBConnection();
     $stmt = $db->prepare("SELECT Twitch, BIN(TwitchVerified), GameWisp, BIN(GameWispVerified) FROM minecraft WHERE UUID=?");
     $out = [];

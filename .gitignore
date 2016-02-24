@@ -1,8 +1,6 @@
 maven
 files
 perks.json
-mysql.php
-twitch.inc.php
-gamewisp.inc.php
+*.inc.php
 twitch.json
 .idea/

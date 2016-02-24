@@ -10,7 +10,7 @@
   if (isset($_GET['p'])) $page = $_GET['p'];
   else if (isset($_GET['page'])) $page = $_GET['page'];
   
-  include("mysql.php");
+  include("mysql.inc.php");
   
   if (isset($_GET["logout"])) 
   {

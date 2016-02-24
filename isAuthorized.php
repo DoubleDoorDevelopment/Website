@@ -45,7 +45,7 @@ function checkUUID($uuid)
 
 try
 {
-    include "mysql.php";
+    include "mysql.inc.php";
     $db = makeDBConnection();
 
     $stmt = $db->prepare('SELECT UUID, Twitch, TwitchToken, GameWispAccessToken FROM minecraft WHERE APIToken=?');

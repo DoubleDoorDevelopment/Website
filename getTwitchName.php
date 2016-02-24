@@ -39,7 +39,7 @@ if (!ctype_alnum($uuid))
 
 try
 {
-    include "mysql.php";
+    include "mysql.inc.php";
     $db = makeDBConnection();
     $stmt = $db->prepare("SELECT Twitch FROM minecraft WHERE UUID=? AND TwitchVerified = 1");
     $stmt->execute(array($uuid));
