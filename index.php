@@ -1,7 +1,7 @@
 <?
-  // Error reporting for debug
-//  error_reporting(E_ALL);
-//  ini_set("display_errors", 1);
+//   Error reporting for debug
+  error_reporting(E_ALL);
+  ini_set("display_errors", 1);
   $start = microtime(true);
   
   session_start();
@@ -83,7 +83,7 @@
 			<div class="container">
 				<p class="muted credit">
 					<a href="?p=about">&copy; 2014 - 2016 Double Door Development</a><br>
-          Built in <? $end = microtime(true); echo round(($end - $start), 4);?> sec.
+                    <a href="?p=legal">TOS and Privacy</a>
 				</p>
 			</div>
 		</div>

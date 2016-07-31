@@ -1,7 +1,10 @@
 <h2>Account linking service</h2>
+<p>On July 14th I (Dries007) royally fucked up. The linking database got wiped, you will have to re-link your accounts. Old API keys are also invalid now. I'm so sorry for this.<br/>
+    There are new backup protocols in place to prevent this in the future.</p>
 <?php
 include "twitch.inc.php";
 include "gamewisp.inc.php";
+include "beam.inc.php";
 
 $token = null;
 
@@ -9,10 +12,137 @@ $SERVICES = [
     "Twitch" => [
         "name-column" => "Twitch",
         "verified-column"=> "TwitchVerified",
+        "redirect" => function() {
+            $query = http_build_query([
+                'response_type' => 'token',
+                'client_id' => TWITCH_CLIENTID,
+                'redirect_uri' => 'http://doubledoordev.net/?p=linking',
+                'state' => base64_encode(json_encode(['token' => $_GET['token'], 'service' => $_GET['service'], 'uuid' => $_GET['uuid']]))
+            ]);
+            header("Location: https://api.twitch.tv/kraken/oauth2/authorize?scope=channel_subscriptions+channel_check_subscription+user_read+user_subscriptions&$query");
+        },
+        "catch" => function($nameCol, $verifiedCol, $state, $db) {
+            $token = $_GET['access_token'];
+            $json = @json_decode(file_get_contents("https://api.twitch.tv/kraken/user?oauth_token=$token"), true);
+            if ($json == NULL) die("The Twitch API seems to be down.");
+            $name = $json["name"];
+
+            if ($name == null) die("Error");
+
+            $stmt = $db->prepare("UPDATE minecraft SET $nameCol=?, $verifiedCol=1, TwitchToken=? WHERE UUID=? AND $nameCol=?");
+            $stmt->execute([$name, $token, $state['uuid'], $state['token']]);
+            if ($stmt->rowCount() != 1) die ("Token expired. Please try again.");
+        }
     ],
     "GameWisp" => [
         "name-column"=> "GameWisp",
-        "verified-column"=> "GameWispVerified"
+        "verified-column"=> "GameWispVerified",
+        "redirect" => function() {
+            $query = http_build_query([
+                'response_type' => 'code',
+                'client_id' => GAMEWISP_CLIENTID,
+                'redirect_uri' => 'http://doubledoordev.net/?p=linking',
+                'scope' => 'user_read,read_only',
+                'state' => base64_encode(json_encode(['token' => $_GET['token'], 'service' => $_GET['service'], 'uuid' => $_GET['uuid']]))
+            ]);
+            header("Location: https://api.gamewisp.com/pub/v1/oauth/authorize?$query");
+        },
+        "catch" => function($nameCol, $verifiedCol, $state, $db) {
+            $url = 'https://api.gamewisp.com/pub/v1/oauth/token';
+            $data = [
+                'grant_type' => 'authorization_code',
+                'client_id' => GAMEWISP_CLIENTID,
+                'client_secret' => GAMEWISP_CLIENTSECRET,
+                'redirect_uri' => 'http://doubledoordev.net/?p=linking',
+                'code'          => $_GET['code']
+            ];
+
+            $options = [
+                'http' => [
+                    'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                    'method'  => 'POST',
+                    'content' => http_build_query($data),
+                ]
+            ];
+            $context  = stream_context_create($options);
+            $result = @file_get_contents($url, false, $context);
+            if ($result === FALSE) die("Error getting token from GameWisp API.");
+
+            $result = json_decode($result, true);
+            // To compensate for the format change.
+            if (!isset($result['access_token'])) $result = $result['data'];
+            $token = $result['access_token'];
+            $expire = $result['expires_in'];
+
+            $json = @json_decode(file_get_contents("https://api.gamewisp.com/pub/v1/user/information?include=profile&access_token=$token"), true);
+            if ($json == NULL) die("The GameWisp API seems to be down.");
+            $name = $json['data']['username'];
+
+            if ($name == null) die("Error");
+
+            $stmt = $db->prepare("UPDATE minecraft SET $nameCol=?, $verifiedCol=1, GameWispAccessToken=?, GameWispRefreshToken=?, GameWispExpire=FROM_UNIXTIME(UNIX_TIMESTAMP() + $expire) WHERE UUID=? AND $nameCol=?");
+            $stmt->execute([$name, $token, $result['refresh_token'], $state['uuid'], $state['token']]);
+            if ($stmt->rowCount() != 1) die ("Token expired. Please try again.");
+        }
+    ],
+    "Beam" => [
+        "name-column"=> "Beam",
+        "verified-column"=> "BeamVerified",
+        "redirect" => function() {
+            $query = http_build_query([
+                'response_type' => 'code',
+                'client_id' => BEAM_CLIENTID,
+                'redirect_uri' => 'http://doubledoordev.net/linking',
+                'scope' => 'user:details:self',
+                'state' => base64_encode(json_encode(['token' => $_GET['token'], 'service' => $_GET['service'], 'uuid' => $_GET['uuid']]))
+            ]);
+            header("Location: https://beam.pro/oauth/authorize?$query");
+        },
+        "catch" => function($nameCol, $verifiedCol, $state, $db) {
+            $url = 'https://beam.pro/api/v1/oauth/token';
+            $data = [
+                'grant_type' => 'authorization_code',
+                'client_id' => BEAM_CLIENTID,
+                'client_secret' => BEAM_CLIENTSECRET,
+                'redirect_uri' => 'http://doubledoordev.net/linking',
+                'code' => $_GET['code']
+            ];
+
+            $options = [
+                'http' => [
+                    'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                    'method'  => 'POST',
+                    'content' => http_build_query($data),
+                ]
+            ];
+
+            $context  = stream_context_create($options);
+            $result = file_get_contents($url, false, $context);
+            if ($result === FALSE) die("Error getting token from Beam API.");
+
+            $result = json_decode($result, true);
+            $token = $result['access_token'];
+            $expire = $result['expires_in'];
+
+            $opts = [
+                'http' => [
+                    'method'  => 'GET',
+                    'header' => [
+                        "Authorization: Bearer $token"
+                    ],
+                ]
+            ];
+            $context = stream_context_create($opts);
+            $json = @json_decode(file_get_contents("https://beam.pro/api/v1/users/current", false, $context), true);
+            if ($json == NULL) die("The GameWisp API seems to be down.");
+            $name = $json['username'];
+
+            if ($name == null) die("Error");
+
+            $stmt = $db->prepare("UPDATE minecraft SET $nameCol=?, $verifiedCol=1, BeamAccessToken=?, BeamRefreshToken=?, BeamId=?, BeamChannel=?, BeamExpire=FROM_UNIXTIME(UNIX_TIMESTAMP() + $expire) WHERE UUID=? AND $nameCol=?");
+            $stmt->execute([$name, $token, $result['refresh_token'], $json['id'], $json['channel']['id'], $state['uuid'], $state['token']]);
+            if ($stmt->rowCount() != 1) die ("Token expired. Please try again.");
+        }
     ]
 ];
 
@@ -25,33 +155,13 @@ if (isset($_GET['service'], $_GET['token'], $_GET['uuid']))
     $verifiedCol = $SERVICES[$_GET['service']]['verified-column'];
 
     $db = makeDBConnection();
-    $stmt = $db->prepare("SELECT $nameCol FROM minecraft WHERE UUID=? AND $nameCol=? AND $verifiedCol=0");
+    $stmt = $db->prepare("SELECT $nameCol FROM minecraft WHERE UUID=? AND $nameCol=?");
     $stmt->execute([$_GET['uuid'], $_GET['token']]);
     $tmp = $stmt->fetch(PDO::FETCH_NUM);
     if ($tmp == null) die ("Something went wrong. Your token might have been reset. Please try again.");
 
-    if ($_GET['service'] == "Twitch")
-    {
-        $query = http_build_query([
-            'response_type' => 'token',
-            'client_id' => TWITCH_CLIENTID,
-            'redirect_uri' => 'http://doubledoordev.net/?p=linking',
-            'state' => base64_encode(json_encode(['token' => $_GET['token'], 'service' => $_GET['service'], 'uuid' => $_GET['uuid']]))
-        ]);
-        header("Location: https://api.twitch.tv/kraken/oauth2/authorize?scope=channel_subscriptions+channel_check_subscription+user_read+user_subscriptions&$query");
-    }
-    else if ($_GET['service'] == "GameWisp")
-    {
-        $query = http_build_query([
-            'response_type' => 'code',
-            'client_id' => GAMEWISP_CLIENTID,
-            'redirect_uri' => 'http://doubledoordev.net/?p=linking',
-            'scope' => 'user_read,read_only',
-            'state' => base64_encode(json_encode(['token' => $_GET['token'], 'service' => $_GET['service'], 'uuid' => $_GET['uuid']]))
-        ]);
+    $SERVICES[$_GET['service']]['redirect']();
 
-        header("Location: https://api.gamewisp.com/pub/v1/oauth/authorize?$query");
-    }
     exit;
 }
 elseif (isset($_GET['state']))
@@ -71,56 +181,7 @@ elseif (isset($_GET['state']))
     if ($tmp[0] == 1) die("This service is already verified.");
     if ($stmt->rowCount() != 1) die ("Token expired. Please try again.");
 
-    $name = null;
-    $note = "";
-
-    if ($state['service'] == "Twitch")
-    {
-        $token = $_GET['access_token'];
-        $json = @json_decode(file_get_contents("https://api.twitch.tv/kraken/user?oauth_token=$token"), true);
-        if ($json == NULL) die("The Twitch API seems to be down.");
-        $name = $json["name"];
-
-        if ($name == null) die("Error");
-
-        $stmt = $db->prepare("UPDATE minecraft SET $nameCol=?, $verifiedCol=1, TwitchToken=? WHERE UUID=? AND $nameCol=? AND $verifiedCol=0");
-        $stmt->execute([$name, $token, $state['uuid'], $state['token']]);
-        if ($stmt->rowCount() != 1) die ("Token expired. Please try again.");
-    }
-    else if ($state['service'] == "GameWisp")
-    {
-        $url = 'https://gamewisp.com/api/v1/oauth/token';
-        $data = [
-            'grant_type' => 'authorization_code',
-            'client_id' => GAMEWISP_CLIENTID,
-            'client_secret' => GAMEWISP_CLIENTSECRET,
-            'redirect_uri' => 'http://doubledoordev.net/?p=linking',
-            'code'          => $_GET['code']
-        ];
-
-        $options = array(
-            'http' => array(
-                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-                'method'  => 'POST',
-                'content' => http_build_query($data),
-            ),
-        );
-        $context  = stream_context_create($options);
-        $result = @file_get_contents($url, false, $context);
-        if ($result === FALSE) die("Error getting token from GameWisp API.");
-        $result = json_decode($result, true);
-
-        $token = $result['data']['access_token'];
-        $json = @json_decode(file_get_contents("https://api.gamewisp.com/pub/v1/user/information?include=profile&access_token=$token"), true);
-        if ($json == NULL) die("The GameWisp API seems to be down.");
-        $name = $json["data"]["username"];
-
-        if ($name == null) die("Error");
-
-        $stmt = $db->prepare("UPDATE minecraft SET $nameCol=?, $verifiedCol=1, GameWispAccessToken=?, GameWispRefreshToken=? WHERE UUID=? AND $nameCol=? AND $verifiedCol=0");
-        $stmt->execute([$name, $token, $result['data']['refresh_token'], $state['uuid'], $state['token']]);
-        if ($stmt->rowCount() != 1) die ("Token expired. Please try again.");
-    }
+    $SERVICES[$state['service']]['catch']($nameCol, $verifiedCol, $state, $db);
 ?>
 <div>
     <h3>Linked up <? echo $state['service'] ?></h3>
@@ -131,13 +192,12 @@ else
 {
 ?>
 <div id="main">
-    <h3>For players</h3>
-    <p>
-        To link your Minecraft account with your Twitch or GameWisp accounts, log in to our special 1.8 Minecraft server with a vanilla client.<br/>
-        The ip is <code>doubledoordev.net</code>.<br/>
-        Follow the instructions on screen.
-    </p>
+    <h3><b>For players</b></h3>
+    <p style="font-size: 1.1em">If you want to log onto a server that uses automatic sub whitelisting, your Twitch, GameWisp, ... and Minecraft accounts must be linked.</p>
+    <p style="font-size: 1.1em">To link your accounts, you have to make a <b>Vanilla 1.8.9 Client</b> and connect to this server address: <code>doubledoordev.net</code> and follow the instructions on screen.</p>
+    <p>You only ever have to do this once. The service is independent of streamer, and it should remember your account link forever.</p>
     <h3>For (future) server owners</h3>
+    <p>Currently the Pateon and Beam systems are under development or testing. If you want to use them, drop us a tweet! <a href="https://twitter.com/driesk007">@driesk007</a></p>
     <p>
         Follow the instructions for players.<br/>
         If you also want to use this service for your servers, look on our projects page!<br/>
