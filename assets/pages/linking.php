@@ -1,6 +1,5 @@
 <h2>Account linking service</h2>
-<p>On July 14th I (Dries007) royally fucked up. The linking database got wiped, you will have to re-link your accounts. Old API keys are also invalid now. I'm so sorry for this.<br/>
-    There are new backup protocols in place to prevent this in the future.</p>
+<p>If you linked before July 14th 2016, you may have to re-link your accounts. If you do, remember that API keys are also invalidated!</p>
 <?php
 include "twitch.inc.php";
 include "gamewisp.inc.php";
@@ -185,6 +184,9 @@ elseif (isset($_GET['state']))
 ?>
 <div>
     <h3>Linked up <? echo $state['service'] ?></h3>
+    <p>You should be getting a message in your Minecraft client within 10 seconds to confirm.</p>
+    <p>You can now close this page, and if you have linked up the relevant services, you can also disconnect from the authentication server.</p>
+    <p>There is no waiting period on joining any sub server. Go ahead and have fun!</p>
 </div>
 <?php
 }
@@ -193,11 +195,11 @@ else
 ?>
 <div id="main">
     <h3><b>For players</b></h3>
-    <p style="font-size: 1.1em">If you want to log onto a server that uses automatic sub whitelisting, your Twitch, GameWisp, ... and Minecraft accounts must be linked.</p>
-    <p style="font-size: 1.1em">To link your accounts, you have to make a <b>Vanilla 1.8.9 Client</b> and connect to this server address: <code>doubledoordev.net</code> and follow the instructions on screen.</p>
+    <p style="font-size: 1.1em">If you want to log onto a server that uses automatic subscriber whitelisting you need to link your Twitch, GameWisp, Beam... and Minecraft accounts!</p>
+    <p style="font-size: 1.1em">To link your accounts, you have to make a Vanilla <b>1.10 Client</b> and connect to this server address: <code>doubledoordev.net</code> and follow the instructions on screen.</p>
     <p>You only ever have to do this once. The service is independent of streamer, and it should remember your account link forever.</p>
     <h3>For (future) server owners</h3>
-    <p>Currently the Pateon and Beam systems are under development or testing. If you want to use them, drop us a tweet! <a href="https://twitter.com/driesk007">@driesk007</a></p>
+    <p>The Patreon API is lacking essentials features at the moment.</p>
     <p>
         Follow the instructions for players.<br/>
         If you also want to use this service for your servers, look on our projects page!<br/>
